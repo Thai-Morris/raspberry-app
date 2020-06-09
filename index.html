@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+    <meta name="viewport" content=" user-scalable=0, initial-scale=1.0, width=320.1, maximum-scale=1" media="device-height: 960px" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <title>RPI Isolated I/O</title>
+
+    <style>
+        .noSelect               { user-select: none; }
+
+        .mainContainer          { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: 0; padding: 0; color: #2ba3ce; font-size: 40px; font-family: 'Montserrat', sans-serif; font-weight: 300; }
+
+        .auxPowerButton         { position: absolute; top: 30px; left: 30px; width: 100px; height: 60px; background-color: #eee; border-radius: 5px; }
+        .auxPowerRevButton      { position: absolute; top: 30px; left: 150px; width: 100px; height: 60px; background-color: #eee; border-radius: 5px; }
+
+        .outputsBox             { position: absolute; top: 150px; left: 30px; width: 500px; height: 215px; border-bottom: 1px #2ba3ce solid; box-sizing: border-box; }
+        .outputBoxBanner        { position: absolute; top: 0; left: 0; width: 100%; height: 30px; }
+        .outputBoxBannerLine    { position: absolute; top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1px #2ba3ce solid; }
+        .outputBoxBannerLabel   { position: relative; width: 160px; height: 100%; line-height: 30px; margin: auto; background-color: white; color: #aaa; font-size: 24px; font-weight: bold; text-align: center; }
+        .outputContent          { position: absolute; top: 40px; left: 0; bottom: 10px; width: 100%; }
+        .outputRelayBox         { position: relative; float: left; width: 12.5%; height: 100%; }
+        .relayNoPin             { position: absolute; top: 0; left: 0; width: 100%; height: 30px; }
+        .relayNcPin             {  }
+        .relayComPin            { position: absolute; top: 79px; left: 0; width: 100%; height: 30px; }
+        .relaySwitchBox         { position: relative; top: 26px; width: 30px; margin: auto; height: 57px; }
+        .relaySwitchLine        { position: absolute; top: 0; left: 0; width: 52%; height: 100%; border-right: 1px #ddd solid; box-sizing: border-box; }
+        .relayswitchWhite       { position: absolute; top: 8px; left: 0; width: 100%; height: 41px; background-color: white; }
+        .relayPin               { position: relative; top: 50%; margin: auto; margin-top: -11px; width: 20px; height: 20px; border: 1px #aaa solid; border-radius: 11px; background-color: #eee; }
+        .relayContact           { position: relative; width: 10px; height: 10px; margin: auto; border: 1px #ddd solid; box-sizing: border-box; border-radius: 6px; }
+        .relaySwitch            { position: absolute; top: 18px; left: 48%; width: 1px; height: 23px; background-color: #ddd; }
+    /*    .relaySwitchOpen        { transform: rotate(-20deg) translateX(-4px); } */
+        .relaySwitchOpen        { transform: skewX(20deg); left: 36%; }
+        .rcTop                  { top: 8px; }
+        .rcBottom               { top: 30px; }
+        .relayControlBox        { position: absolute; bottom: 5px; left: 0; width: 100%; height: 30px; }
+        .relayControlButton     { position: absolute; left: 50%; width: 30px; margin-left: -15px; height: 30px; background-color: #eee; border-radius: 15px; cursor: pointer; }
+        .relayButtonLabel       { position: relative; top: 50%; width: 100%; height: 20px; line-height: 20px; margin-top: -10px; font-size: 11px; font-weight: bold; text-align: center; user-select: none; }
+        .buttonActive           { background-color: #2ba3ce; color: white; }
+
+    </style>
+</head>
+<body>
+    
+<div class="mainContainer">
+    <button id="onButton" class="button" class="btn btn-primary btn-lg" onclick="button()">
+        <!-- Database Button, pressing this button does something on the database-->
+        <p> Press ME! </p>
+    </button>
+    <button id="viewButton" class="button" class="btn btn-primary btn-lg" onclick="DBbutton()">
+        <!-- Database Button, pressing this button does something on the database-->
+        <p> View Database </p>
+    </button>
+    <script>
+        function DBbutton() {
+                    webSocket.emit('template', JSON.stringify({ type: 'viewbutton' }));
+                };
+         function button() {
+                    webSocket.emit('template', JSON.stringify({ type: 'button' }));
+                };
+    </script>
+
+   
+</div>
+
+<div id=data>
+    
+</div>
+<script src="/js/jquery-3.3.1.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+$(document).ready(() => {
+
+$.ajax({
+    url: "http://localhost:4444", 
+    method: 'GET',
+    success: function(response){
+        if(response.rows.length > 0){
+            for(let index = 0; index < response.rows.length; index++) {
+                var newRow = $("<tr>");
+                var cols = "";
+                var name = "";
+                var address = '';
+                cols += '<td> '+ response.rows[index].name +'</td>';
+                cols += '<td> '+ response.rows[index].address+'</td>';                
+                newRow.append(cols);
+                $("#tableData .tbody").append(newRow);
+            }  
+
+        }
+    }
+})
+})
+
+</script>
+<script>
+    var msg;
+    var rxMsgCount                          = 0;
+    var webSocket                           = io.connect(location.host);
+
+
+    webSocket.on('connect', function(data) {
+        webSocket.emit('template', JSON.stringify({type: "connect", msgType: "connect"}));
+    });
+
+    webSocket.on('template', function(data) {
+        try {
+            msg                             = JSON.parse(data);
+            switch (msg.type) {
+                case 'cack':
+                    console.log(msg);
+                    break;
+
+                default:
+                    break;
+            }
+        } catch (ex) { }
+    });
+
+
+    updateTimer                             = setInterval(function() {
+        webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "update"}));
+    }, 1000);
+
+    
+    $('#relayControl7').on('touchup click', function(evt) {
+       if ($('#relayControl7').hasClass('buttonActive')) {
+           $('#relayControl7').removeClass('buttonActive');
+           $('#relayControlLabel7').html('ON');
+           $('#relaySwitch7').addClass('relaySwitchOpen');
+           webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 7, state: "off"}));
+       } else {
+           $('#relayControl7').addClass('buttonActive');
+           $('#relayControlLabel7').html('OFF');
+           $('#relaySwitch7').removeClass('relaySwitchOpen');
+           webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 7, state: "on"}));
+       }
+    });
+    $('#relayControl6').on('touchup click', function(evt) {
+        if ($('#relayControl6').hasClass('buttonActive')) {
+            $('#relayControl6').removeClass('buttonActive');
+            $('#relayControlLabel6').html('ON');
+            $('#relaySwitch6').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 6, state: "off"}));
+        } else {
+            $('#relayControl6').addClass('buttonActive');
+            $('#relayControlLabel6').html('OFF');
+            $('#relaySwitch6').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 6, state: "on"}));
+        }
+    });
+    $('#relayControl5').on('touchup click', function(evt) {
+        if ($('#relayControl5').hasClass('buttonActive')) {
+            $('#relayControl5').removeClass('buttonActive');
+            $('#relayControlLabel5').html('ON');
+            $('#relaySwitch5').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 5, state: "off"}));
+        } else {
+            $('#relayControl5').addClass('buttonActive');
+            $('#relayControlLabel5').html('OFF');
+            $('#relaySwitch5').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 5, state: "on"}));
+        }
+    });
+    $('#relayControl4').on('touchup click', function(evt) {
+        if ($('#relayControl4').hasClass('buttonActive')) {
+            $('#relayControl4').removeClass('buttonActive');
+            $('#relayControlLabel4').html('ON');
+            $('#relaySwitch4').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 4, state: "off"}));
+        } else {
+            $('#relayControl4').addClass('buttonActive');
+            $('#relayControlLabel4').html('OFF');
+            $('#relaySwitch4').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 4, state: "on"}));
+        }
+    });
+    $('#relayControl3').on('touchup click', function(evt) {
+        if ($('#relayControl3').hasClass('buttonActive')) {
+            $('#relayControl3').removeClass('buttonActive');
+            $('#relayControlLabel3').html('ON');
+            $('#relaySwitch3').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 3, state: "off"}));
+        } else {
+            $('#relayControl3').addClass('buttonActive');
+            $('#relayControlLabel3').html('OFF');
+            $('#relaySwitch3').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 3, state: "on"}));
+        }
+    });
+    $('#relayControl2').on('touchup click', function(evt) {
+        if ($('#relayControl2').hasClass('buttonActive')) {
+            $('#relayControl2').removeClass('buttonActive');
+            $('#relayControlLabel2').html('ON');
+            $('#relaySwitch2').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 2, state: "off"}));
+        } else {
+            $('#relayControl2').addClass('buttonActive');
+            $('#relayControlLabel2').html('OFF');
+            $('#relaySwitch2').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 2, state: "on"}));
+        }
+    });
+    $('#relayControl1').on('touchup click', function(evt) {
+        if ($('#relayControl1').hasClass('buttonActive')) {
+            $('#relayControl1').removeClass('buttonActive');
+            $('#relayControlLabel1').html('ON');
+            $('#relaySwitch1').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 1, state: "off"}));
+        } else {
+            $('#relayControl1').addClass('buttonActive');
+            $('#relayControlLabel1').html('OFF');
+            $('#relaySwitch1').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 1, state: "on"}));
+        }
+    });
+    $('#relayControl0').on('touchup click', function(evt) {
+        if ($('#relayControl0').hasClass('buttonActive')) {
+            $('#relayControl0').removeClass('buttonActive');
+            $('#relayControlLabel0').html('ON');
+            $('#relaySwitch0').addClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 0, state: "off"}));
+        } else {
+            $('#relayControl0').addClass('buttonActive');
+            $('#relayControlLabel0').html('OFF');
+            $('#relaySwitch0').removeClass('relaySwitchOpen');
+            webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 0, state: "on"}));
+        }
+    });
+
+</script>
+</body>
+</html>

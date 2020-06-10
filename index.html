@@ -70,28 +70,7 @@
 <script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-$(document).ready(() => {
 
-$.ajax({
-    url: "http://localhost:4444", 
-    method: 'GET',
-    success: function(response){
-        if(response.rows.length > 0){
-            for(let index = 0; index < response.rows.length; index++) {
-                var newRow = $("<tr>");
-                var cols = "";
-                var name = "";
-                var address = '';
-                cols += '<td> '+ response.rows[index].name +'</td>';
-                cols += '<td> '+ response.rows[index].address+'</td>';                
-                newRow.append(cols);
-                $("#tableData .tbody").append(newRow);
-            }  
-
-        }
-    }
-})
-})
 
 </script>
 <script>

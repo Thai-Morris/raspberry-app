@@ -66,8 +66,10 @@ io.on('connection', function(socket) {
                 
                 case 'viewbutton':
                     console.log("Well the button works");
-                    app.get('/', function(request, response){
-                        console.log('') 
+                        // sends something over to the websocket
+                        // io.emit()
+
+
                         con.query("SELECT * FROM customers", function (err, result) {
                             if (err) throw err;
                             else{
@@ -76,7 +78,7 @@ io.on('connection', function(socket) {
                             }
                     
                         });
-                    })
+                    
                     
 
                     break;

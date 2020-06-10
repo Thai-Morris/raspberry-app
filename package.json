@@ -1,8 +1,8 @@
 {
   "name": "pi",
   "version": "1.0.0",
-  "description": "",
-  "main": "server.js",
+  "description": "This is a basic web 'app' for raspberry pi",
+  "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node app.js"

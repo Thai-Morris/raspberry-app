@@ -67,20 +67,17 @@ io.on('connection', function(socket) {
                 case 'viewbutton':
                     console.log("Well the button works");
                         // sends something over to the websocket
-                        // io.emit()
+                        
 
+                    con.query("SELECT * FROM customers", function (err, result) {
+                        if (err) throw err;
+                        else{
+                            console.log("the database has been parsed")
 
-                        con.query("SELECT * FROM customers", function (err, result) {
-                            if (err) throw err;
-                            else{
-                                response.send(result)
-                                console.log("the database has been parsed")
-                            }
+                            io.emit('template', JSON.stringify({ type: 'dbResponse', data: result }));
+                        }
                     
-                        });
-                    
-                    
-
+                    });
                     break;
                 case 'button':
                     // console.log("doing SQL stuff!");

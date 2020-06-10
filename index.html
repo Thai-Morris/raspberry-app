@@ -7,39 +7,7 @@
 
     <title>RPI Isolated I/O</title>
 
-    <style>
-        .noSelect               { user-select: none; }
-
-        .mainContainer          { position: absolute; top: 0; left: 0; right: 0; bottom: 0; margin: 0; padding: 0; color: #2ba3ce; font-size: 40px; font-family: 'Montserrat', sans-serif; font-weight: 300; }
-
-        .auxPowerButton         { position: absolute; top: 30px; left: 30px; width: 100px; height: 60px; background-color: #eee; border-radius: 5px; }
-        .auxPowerRevButton      { position: absolute; top: 30px; left: 150px; width: 100px; height: 60px; background-color: #eee; border-radius: 5px; }
-
-        .outputsBox             { position: absolute; top: 150px; left: 30px; width: 500px; height: 215px; border-bottom: 1px #2ba3ce solid; box-sizing: border-box; }
-        .outputBoxBanner        { position: absolute; top: 0; left: 0; width: 100%; height: 30px; }
-        .outputBoxBannerLine    { position: absolute; top: 0; left: 0; width: 100%; height: 50%; border-bottom: 1px #2ba3ce solid; }
-        .outputBoxBannerLabel   { position: relative; width: 160px; height: 100%; line-height: 30px; margin: auto; background-color: white; color: #aaa; font-size: 24px; font-weight: bold; text-align: center; }
-        .outputContent          { position: absolute; top: 40px; left: 0; bottom: 10px; width: 100%; }
-        .outputRelayBox         { position: relative; float: left; width: 12.5%; height: 100%; }
-        .relayNoPin             { position: absolute; top: 0; left: 0; width: 100%; height: 30px; }
-        .relayNcPin             {  }
-        .relayComPin            { position: absolute; top: 79px; left: 0; width: 100%; height: 30px; }
-        .relaySwitchBox         { position: relative; top: 26px; width: 30px; margin: auto; height: 57px; }
-        .relaySwitchLine        { position: absolute; top: 0; left: 0; width: 52%; height: 100%; border-right: 1px #ddd solid; box-sizing: border-box; }
-        .relayswitchWhite       { position: absolute; top: 8px; left: 0; width: 100%; height: 41px; background-color: white; }
-        .relayPin               { position: relative; top: 50%; margin: auto; margin-top: -11px; width: 20px; height: 20px; border: 1px #aaa solid; border-radius: 11px; background-color: #eee; }
-        .relayContact           { position: relative; width: 10px; height: 10px; margin: auto; border: 1px #ddd solid; box-sizing: border-box; border-radius: 6px; }
-        .relaySwitch            { position: absolute; top: 18px; left: 48%; width: 1px; height: 23px; background-color: #ddd; }
-    /*    .relaySwitchOpen        { transform: rotate(-20deg) translateX(-4px); } */
-        .relaySwitchOpen        { transform: skewX(20deg); left: 36%; }
-        .rcTop                  { top: 8px; }
-        .rcBottom               { top: 30px; }
-        .relayControlBox        { position: absolute; bottom: 5px; left: 0; width: 100%; height: 30px; }
-        .relayControlButton     { position: absolute; left: 50%; width: 30px; margin-left: -15px; height: 30px; background-color: #eee; border-radius: 15px; cursor: pointer; }
-        .relayButtonLabel       { position: relative; top: 50%; width: 100%; height: 20px; line-height: 20px; margin-top: -10px; font-size: 11px; font-weight: bold; text-align: center; user-select: none; }
-        .buttonActive           { background-color: #2ba3ce; color: white; }
-
-    </style>
+    
 </head>
 <body>
     
@@ -64,9 +32,13 @@
    
 </div>
 
-<div id=data>
-    
-</div>
+<table id="tableData" class="table table-fixed">
+    <thead>
+      <tr>
+      </tr>
+    </thead>
+    <tbody class="tbody" >
+    </tbody>
 <script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -85,12 +57,54 @@
 
     webSocket.on('template', function(data) {
         try {
-            msg                             = JSON.parse(data);
+           var msg                             = JSON.parse(data);
             switch (msg.type) {
                 case 'cack':
                     console.log(msg);
                     break;
+                case 'dbResponse':
+                    lol = msg.data;
+                    console.log(lol);
+                    
+                    if(lol.length > 0){
+                                    for(let index = 0; index < lol.length; index++) {
+                                        var newRow = $("<tr>");
+                                        var cols = "";
+                                        var name = '';
+                                        var address = '';
+                                        cols += '<td> '+ lol.length[index].name +'</td>';
+                                        cols += '<td> '+ lol.length[index].address+'</td>';                
+                                        newRow.append(cols);
+                                        $("#tableData .tbody").append(newRow);
+                                        console.log("hello there");
+                                    }  
+                                }
+                            
+                   
 
+
+                    // I am just gonna use classic dom or jquery here.
+                    // $(document).ready(() => {
+                    //     $.ajax({
+                    //         // url: url,
+                    //         success:function(msg){
+                    //             if(msg.data.length > 0){
+                    //                 for(let index = 0; index < msg.rows.length; index++) {
+                    //                     var newRow = $("<tr>");
+                    //                     var cols = "";
+                    //                     var name = '';
+                    //                     cols += '<td> '+ msg.rows[index].name +'</td>';
+                    //                     cols += '<td> '+ msg.rows[index].address+'</td>';                
+                    //                     newRow.append(cols);
+                    //                     $("#tableData .tbody").append(newRow);
+                    //                 }  
+
+                    //             }
+                    //         }
+                    //     })
+                    //     })
+
+                    break;
                 default:
                     break;
             }
@@ -207,6 +221,10 @@
             webSocket.emit('isoio', JSON.stringify({type: "mgmnt", msgType: "relay", position: 0, state: "on"}));
         }
     });
+
+</script>
+
+<script>
 
 </script>
 </body>

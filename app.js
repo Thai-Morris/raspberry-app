@@ -14,7 +14,7 @@ let io                                      = require("socket.io")(http);
 let dgram                                   = require('dgram');
 let os                                      = require('os').networkInterfaces();
 let fs                                      = require('fs');
-let ejs =require('ejs');
+
 
 
 

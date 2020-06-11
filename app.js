@@ -72,7 +72,10 @@ io.on('connection', function(socket) {
                     con.query("SELECT * FROM customers", function (err, result) {
                         if (err) throw err;
                         else{
-                            console.log("the database has been parsed")
+
+
+                            console.log("the database has been parsed") 
+                            console.log(result);
 
                             io.emit('template', JSON.stringify({ type: 'dbResponse', data: result }));
                         }

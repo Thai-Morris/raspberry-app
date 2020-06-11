@@ -65,20 +65,22 @@
                 case 'dbResponse':
                     lol = msg.data;
                     console.log(lol);
-                    
-                    if(lol.length > 0){
-                                    for(let index = 0; index < lol.length; index++) {
-                                        var newRow = $("<tr>");
-                                        var cols = "";
-                                        var name = '';
-                                        var address = '';
-                                        cols += '<td> '+ lol.length[index].name +'</td>';
-                                        cols += '<td> '+ lol.length[index].address+'</td>';                
-                                        newRow.append(cols);
-                                        $("#tableData .tbody").append(newRow);
-                                        console.log("hello there");
-                                    }  
-                                }
+                    $(function() {
+                        console.log( "ready!" );
+                        if(lol.length > 0){
+                                        for(let index = 0; index < lol.length; index++) {
+                                            var newRow = $("<tr>");
+                                            var cols = "";
+                                            var name = '';
+                                            var address = '';
+                                            cols += '<td> '+ lol.length[index].name +'</td>';
+                                            cols += '<td> '+ lol.length[index].address+'</td>';                
+                                            newRow.append(cols);
+                                            $("#tableData .tbody").append(newRow);
+                                            console.log("hello there");
+                                        }  
+                                    }
+                                });
                             
                    
 

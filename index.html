@@ -4,17 +4,30 @@
     <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
     <meta name="viewport" content=" user-scalable=0, initial-scale=1.0, width=320.1, maximum-scale=1" media="device-height: 960px" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/skeleton.css">
+  
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+  
 
     <title>RPI Isolated I/O</title>
 
     
 </head>
 <body>
-    
+    <h1>
+        Real-time Database testing 
+    </h1>
 <div class="mainContainer">
     <button id="onButton" class="button" class="btn btn-primary btn-lg" onclick="button()">
         <!-- Database Button, pressing this button does something on the database-->
-        <p> Press ME! </p>
+        <p> Add a new query </p>
     </button>
     <button id="viewButton" class="button" class="btn btn-primary btn-lg" onclick="DBbutton()">
         <!-- Database Button, pressing this button does something on the database-->
@@ -32,13 +45,9 @@
    
 </div>
 
-<table id="tableData" class="table table-fixed">
-    <thead>
-      <tr>
-      </tr>
-    </thead>
-    <tbody class="tbody" >
-    </tbody>
+<table class="container" id="tableData"> 
+    
+</table>
 <script src="/js/jquery-3.3.1.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script>
@@ -63,12 +72,28 @@
                     console.log(msg);
                     break;
                 case 'dbResponse':
-                    lol = msg.data;
+                    let lol = msg.data;
                     console.log(lol);
+    
 
+
+                    //I will return to this code when
+                    // var table = new Tabulator("#tableData", {
+                    //     index:"id.id",
+                    //     data:tableData, //set initial table data
+                    //     columns:[
+                    //         {title:"name", field:"name.name"},
+                    //         {title:"address", field:"address.address"},
+                    //     ],
+                    // });
+                    // table.setData(tableData);
+                    
+
+                    // this code works, I just commented it out because I am looking for a better method.
+                    document.getElementById('tableData').innerHTML = '';
+                    // document.getElementById('tableData').insertAdjacentHTML('beforebegin', '<div id=header class="container"><tr class="row"> <th>Id</th> <th>Name</th> <th>Address</th></tr></div>');
                     lol.forEach(function(item, index, arr) {
-                        $("tableData").empty();
-                        document.getElementById("tableData").innerHTML += index + ":" + item.name + item.address + "<br>";
+                        document.getElementById("tableData").innerHTML += '<tr  class="row">'+ '<td>'+ index + '</td>'+ '<td>' + item.name + '</td>'+ '<td>'+ item.address + '</td>'+ "</tr>" + '<br>';
                         
                     });
 
